@@ -15,32 +15,34 @@ class netdata::install inherits netdata {
     'zlib1g-dev',
   ]
 
-  # recommended packages for full functionality of netdata
   $plugin_deps = [
-    'iproute2', # provides the 'tc' application
+    'iproute2',
     'python',
     'python-yaml',
     'python-mysqldb',
     'python-psycopg2',
     'nodejs',
-    'lm-sensors',
     'libmnl0',
     'netcat'
   ]
 
-  if $netdata::install_dependencies == true {
+  if $netdata::install_dependencies {
     ensure_packages( $build_deps, {'ensure' => 'present'} )
   }
 
-  if $netdata::install_plugin_dependencies == true {
+  if $netdata::install_plugin_dependencies {
     ensure_packages( $plugin_deps, {'ensure' => 'present'} )
+
+    unless $::is_virtual {
+      ensure_packages( 'lm-sensors', {'ensure' => 'present'} )
+    }
   }
 
-  if $netdata::install_jq == true {
+  if $netdata::install_jq {
     ensure_packages( 'jq', {'ensure' => 'present'} )
   }
 
-  if $netdata::install_from_git == true {
+  if $netdata::install_from_git {
 
     vcsrepo { $netdata::repo_location:
       ensure   => $netdata::repo_ensure,
@@ -49,7 +51,7 @@ class netdata::install inherits netdata {
       before   => Exec['Install netdata'],
     }
 
-    if $netdata::update_with_cron == true {
+    if $netdata::update_with_cron {
       cron { 'netdata-updater.sh':
         command => "${netdata::repo_location}/netdata-updater.sh",
         hour    => $netdata::update_cron_hour,
