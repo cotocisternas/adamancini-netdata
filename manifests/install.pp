@@ -17,7 +17,7 @@ class netdata::install inherits netdata {
 
   $plugin_deps = [
     'iproute2',
-    # 'python',
+    'python',
     'python-yaml',
     'python-mysqldb',
     'python-psycopg2',
@@ -41,7 +41,6 @@ class netdata::install inherits netdata {
   if $netdata::install_jq {
     ensure_packages( 'jq', {'ensure' => 'present'} )
   }
-
 
   vcsrepo { $netdata::repo_location:
     ensure   => $netdata::repo_ensure,
