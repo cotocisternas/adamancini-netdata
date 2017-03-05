@@ -1,6 +1,6 @@
 class netdata::service inherits netdata {
 
-  if $netdata::service_manage == true {
+  if $netdata::service_manage {
 
     case $::facts['service_provider'] {
 
@@ -29,7 +29,7 @@ class netdata::service inherits netdata {
       enable     => $netdata::service_enable,
       name       => $netdata::service_name,
       provider   => $netdata::service_provider,
-      subscribe  => File['netdata config file'],
+      subscribe  => File['netdata_config'],
       hasstatus  => true,
       hasrestart => true,
     }
