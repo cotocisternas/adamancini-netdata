@@ -81,12 +81,6 @@ class netdata (
   $_purge_charts  = $purge['charts.d']
   $_purge_health  = $purge['health.d']
 
-  notify {"python => ${_purge_python}":}
-  notify {"node => ${_purge_node}":}
-  notify {"charts => ${_purge_charts}":}
-  notify {"health => ${_purge_health}":}
-
-
   file { "${netdata::config_dir}/python.d":
     ensure  => directory,
     mode    => '775',
