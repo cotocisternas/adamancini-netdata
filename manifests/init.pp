@@ -8,6 +8,7 @@ class netdata (
   Optional[String] $custom_registry_to_announce,
   Boolean $manage_config,
   Boolean $manage_firewall,
+  Boolean $manage_alarms,
   Boolean $install_dependencies,
   Boolean $install_plugin_dependencies,
   Boolean $install_jq,
@@ -19,25 +20,88 @@ class netdata (
   String $service_ensure,
   Boolean $service_manage,
   String $service_name,
-  # String $service_file,
   Optional[String] $service_provider,
   Optional[Hash] $options,
-  Optional[Boolean] $alarms_send_email,
-  Optional[String] $alarms_default_email_recipient,
-  Optional[Boolean] $alarms_send_pushover,
-  Optional[String] $alarms_default_pushover_recipient,
+  Stdlib::Absolutepath $alarms_notify_config,
+  Optional[Boolean] $alarms_email,
+  Optional[String] $alarms_email_recipient,
+  Optional[Boolean] $alarms_pushover,
+  Optional[String] $alarms_pushover_recipient,
   Optional[String] $alarms_pushover_app_token,
-  Optional[Boolean] $alarms_send_telegram,
-  Optional[String] $alarms_default_telegram_recipient,
+  Optional[Boolean] $alarms_pushbullet,
+  Optional[String] $alarms_pushbullet_access_token,
+  Optional[String] $alarms_pushbullet_recipient,
+  Optional[Boolean] $alarms_twilio,
+  Optional[String] $alarms_twilio_account_sid,
+  Optional[String] $alarms_twilio_account_token,
+  Optional[String] $alarms_twilio_number,
+  Optional[String] $alarms_twilio_recipient,
+  Optional[Boolean] $alarms_messagebird,
+  Optional[String] $alarms_messagebird_access_key,
+  Optional[String] $alarms_messagebird_number,
+  Optional[String] $alarms_messagebird_recipient,
+  Optional[Boolean] $alarms_telegram,
   Optional[String] $alarms_telegram_bot_token,
-  Optional[Boolean] $alarms_send_slack,
+  Optional[String] $alarms_telegram_recipient,
+  Optional[Boolean] $alarms_slack,
   Optional[String] $alarms_slack_webhook_url,
-  Optional[String] $alarms_default_slack_recipient,
+  Optional[String] $alarms_slack_recipient,
+  Optional[Boolean] $alarms_discord,
+  Optional[String] $alarms_discord_webhook_url,
+  Optional[String] $alarms_discord_recipient,
+  Optional[Boolean] $alarms_hipchat,
+  Optional[String] $alarms_hipchat_server,
+  Optional[String] $alarms_hipchat_auth_token,
+  Optional[String] $alarms_hipchat_recipient,
+  Optional[Boolean] $alarms_kafka,
+  Optional[String] $alarms_kafka_url,
+  Optional[String] $alarms_kafka_sender_ip,
+  Optional[Boolean] $alarms_pagerduty,
+  Optional[String] $alarms_pagerduty_recipient,
+
+  Hash $purge,
+
+  Hash $python_options,
+
   ) {
 
   contain netdata::install
   contain netdata::config
   contain netdata::service
+
+  $default_purge_hash={
+    'python.d'  => false,
+    'node.d'    => false,
+    'charts.d'  => false,
+    'health.d'  => false
+  }
+
+  $_purge_python  = $purge['python.d']
+  $_purge_node    = $purge['node.d']
+  $_purge_charts  = $purge['charts.d']
+  $_purge_health  = $purge['health.d']
+
+  notify {"python => ${_purge_python}":}
+  notify {"node => ${_purge_node}":}
+  notify {"charts => ${_purge_charts}":}
+  notify {"health => ${_purge_health}":}
+
+
+  file { "${netdata::config_dir}/python.d":
+    ensure  => directory,
+    mode    => '775',
+    owner   => 'netdata',
+    group   => 'netdata',
+    purge   => $_purge_python,
+    recurse => true,
+    force   => true
+  }
+
+  $python_options.each |$name, $params| {
+    ::netdata::pythond{$name:
+      params => $params
+    }
+  }
 
   Class['::netdata::install'] ->
   Class['::netdata::config'] ~>

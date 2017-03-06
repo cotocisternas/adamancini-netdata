@@ -1,9 +1,18 @@
 ---
+lookup_options:
+  netdata::purge:
+    merge: deep
+  netdata::options:
+    merge: deep
+  netdata::python_options:
+    merge: deep
+
 netdata::release_version: '1.5.0'
 netdata::config_dir: '/etc/netdata'
 netdata::config_file: '/etc/netdata/netdata.conf'
 netdata::manage_config: true
 netdata::manage_firewall: true
+netdata::manage_alarms: true
 netdata::firewall_port: 19999
 netdata::custom_registry_enabled: false
 netdata::custom_registry_hostname: ~
@@ -26,21 +35,47 @@ netdata::update_with_cron: true
 netdata::update_cron_hour: 2
 netdata::update_cron_min: 30
 netdata::update_cron_user: root
-netdata::alarms_send_email: YES
-netdata::alarms_default_email_recipient: root
-netdata::alarms_send_pushover: NO
-netdata::alarms_default_pushover_recipient:
+netdata::alarms_notify_config: '/etc/netdata/health_alarm_notify.conf'
+netdata::alarms_email: true
+netdata::alarms_email_recipient: root
+netdata::alarms_pushover: false
+netdata::alarms_pushover_recipient:
 netdata::alarms_pushover_app_token:
-netdata::alarms_send_telegram: NO
-netdata::alarms_default_telegram_recipient:
+netdata::alarms_pushbullet: false
+netdata::alarms_pushbullet_access_token:
+netdata::alarms_pushbullet_recipient:
+netdata::alarms_twilio: false
+netdata::alarms_twilio_account_sid:
+netdata::alarms_twilio_account_token:
+netdata::alarms_twilio_number:
+netdata::alarms_twilio_recipient:
+netdata::alarms_messagebird: false
+netdata::alarms_messagebird_access_key:
+netdata::alarms_messagebird_number:
+netdata::alarms_messagebird_recipient:
+netdata::alarms_telegram: false
 netdata::alarms_telegram_bot_token:
-netdata::alarms_send_slack: NO
+netdata::alarms_telegram_recipient:
+netdata::alarms_slack: false
 netdata::alarms_slack_webhook_url:
-netdata::alarms_default_slack_recipient:
-
-lookup_options:
-  netdata::options:
-    merge: deep
+netdata::alarms_slack_recipient:
+netdata::alarms_discord: false
+netdata::alarms_discord_webhook_url:
+netdata::alarms_discord_recipient:
+netdata::alarms_hipchat: false
+netdata::alarms_hipchat_server: 'api.hipchat.com'
+netdata::alarms_hipchat_auth_token:
+netdata::alarms_hipchat_recipient:
+netdata::alarms_kafka: false
+netdata::alarms_kafka_url:
+netdata::alarms_kafka_sender_ip:
+netdata::alarms_pagerduty: false
+netdata::alarms_pagerduty_recipient:
+netdata::purge:
+  python.d: false
+  node.d: false
+  charts.d: false
+  health.d: false
 
 netdata::options:
   global:
@@ -86,7 +121,7 @@ netdata::options:
     proc: 'yes'
     diskspace: 'yes'
     cgroups: 'yes'
-    checks: 'yes'
+    checks: 'no'
     enable running new plugins: 'yes'
     check for new plugins every: '60'
     apps: 'yes'
@@ -95,10 +130,12 @@ netdata::options:
     node.d: 'yes'
     python.d: 'yes'
   health:
-    enabled: 'no'
+    enabled: 'yes'
     in memory max health log entries: '1000'
     script to execute on alarm: '/usr/libexec/netdata/plugins.d/alarm-notify.sh'
     health configuration directory: '/etc/netdata/health.d'
     run at least every seconds: '10'
     postpone alarms during hibernation for seconds: '60'
     rotate log every lines: '2000'
+
+netdata::python_options: {}

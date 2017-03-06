@@ -21,11 +21,11 @@ class netdata::config inherits netdata {
       require => Exec['install_netdata']
     }
 
-    if $netdata::alarms_manage {
+    if $netdata::manage_alarms {
       file { 'netdata_alarms':
         ensure  => present,
         content => template('netdata/health_alarm_notify.conf.erb'),
-        path    => $netdata::health_alarms_notify_config,
+        path    => $netdata::alarms_notify_config,
         owner   => $netdata::service_name,
         group   => $netdata::service_name,
         mode    => '0755',
