@@ -91,6 +91,12 @@ class netdata (
     force   => true
   }
 
+  concat { "${netdata::config_dir}/python.d/web_log.conf":
+    owner   => $netdata::service_name,
+    group   => $netdata::service_name,
+    mode    => '0660',
+  }
+
   $python_options.each |$name, $params| {
     ::netdata::pythond{$name:
       params => $params
