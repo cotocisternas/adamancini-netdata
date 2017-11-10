@@ -5,14 +5,11 @@ class netdata::install inherits netdata {
     'autoconf',
     'autogen',
     'automake',
-    'curl',
-    'gcc',
-    'git',
+    'gcc',    
     'libmnl-dev',
     'make',
     'pkg-config',
     'uuid-dev',
-    'zlib1g-dev',
   ]
 
   $plugin_deps = [
@@ -29,6 +26,11 @@ class netdata::install inherits netdata {
   if $netdata::install_dependencies {
     ensure_packages( $build_deps, {'ensure' => 'present'} )
   }
+
+  if ! defined(Package['curl']) { package { 'curl': ensure => 'present', install_options => ['--force-yes'] }}
+  if ! defined(Package['git']) { package { 'git': ensure => 'present', install_options => ['--force-yes'] }}
+  if ! defined(Package['zlib1g-dev']) { package { 'zlib1g-dev': ensure => 'present', install_options => ['--force-yes'] }}
+
 
   if $netdata::install_plugin_dependencies {
     ensure_packages( $plugin_deps, {'ensure' => 'present'} )
